@@ -1,15 +1,26 @@
 const { dirname } = require("path");
 const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: "./src/index.js",
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "./dist"),
-    publicPath:
-      "https://www.melissas.com/cdn/shop/products/2-pounds-image-of-organic-kiwi-fruit-30307832725548_600x600.jpg?v=1652475192",
+    publicPath: "",
   },
-  mode: "none",
+  mode: "development",
+  devServer: {
+    port: 9000,
+    static: {
+      directory: path.resolve(__dirname, "./dist"),
+    },
+    devMiddleware: {
+      index: "index.html",
+      writeToDisk: true,
+    },
+  },
   module: {
     rules: [
       {
@@ -44,6 +55,18 @@ module.exports = {
           },
         },
       },
+      {
+        test: /\.hbs$/,
+        use: ["handlebars-loader"],
+      },
     ],
   },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      title: "Hello World",
+      template: "src/index.hbs",
+      description: "some description",
+    }),
+  ],
 };
