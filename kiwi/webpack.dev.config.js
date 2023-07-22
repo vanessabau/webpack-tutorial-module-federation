@@ -1,24 +1,26 @@
 const { dirname } = require("path");
 const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: {
-    "hello-world": "./src/hello-world.js",
     kiwi: "./src/kiwi.js",
   },
   output: {
-    filename: "[name].[contenthash].js",
+    filename: "[name].bundle.js",
     path: path.resolve(__dirname, "./dist"),
-    publicPath: "/static/",
+    publicPath: "",
   },
-  mode: "production",
-  optimization: {
-    splitChunks: {
-      chunks: "all",
-      minSize: 3000,
+  mode: "development",
+  devServer: {
+    port: 9002,
+    static: {
+      directory: path.resolve(__dirname, "./dist"),
+    },
+    devMiddleware: {
+      index: "kiwi.html",
+      writeToDisk: true,
     },
   },
   module: {
@@ -33,16 +35,8 @@ module.exports = {
         },
       },
       {
-        test: /\.txt/,
-        type: "asset/source",
-      },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
-      },
-      {
         test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+        use: ["style-loader", "css-loader", "sass-loader"],
       },
       {
         test: /\.js$/,
@@ -51,7 +45,6 @@ module.exports = {
           loader: "babel-loader",
           options: {
             presets: ["@babel/env"],
-            plugins: ["@babel/plugin-proposal-class-properties"],
           },
         },
       },
@@ -62,25 +55,12 @@ module.exports = {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: "[name].[contenthash].css",
-    }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      filename: "hello-world.html",
-      chunks: ["hello-world"],
-      title: "Hello World",
-      template: "src/page-template.hbs",
-      description: "hello world",
-      minify: false,
-    }),
-    new HtmlWebpackPlugin({
       filename: "kiwi.html",
-      chunks: ["kiwi"],
       title: "Kiwi",
       template: "src/page-template.hbs",
-      description: "kiwi",
-      minify: false,
+      description: "Kiwi",
     }),
   ],
 };
