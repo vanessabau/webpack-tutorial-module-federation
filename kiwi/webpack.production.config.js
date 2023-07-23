@@ -3,21 +3,21 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { ModuleFederationPlugin } = require("webpack").container;
 
 module.exports = {
-  entry: {
-    kiwi: "./src/kiwi.js",
-  },
+  entry: "./src/kiwi.js",
   output: {
     filename: "[name].[contenthash].js",
     path: path.resolve(__dirname, "./dist"),
-    publicPath: "/static/",
+    publicPath: "http://localhost:9002/",
   },
   mode: "production",
   optimization: {
     splitChunks: {
       chunks: "all",
-      minSize: 3000,
+      minSize: 10000,
+      automaticNameDelimiter: "_",
     },
   },
   module: {
@@ -61,7 +61,13 @@ module.exports = {
       title: "Kiwi",
       template: "src/page-template.hbs",
       description: "kiwi",
-      minify: false,
+    }),
+    new ModuleFederationPlugin({
+      name: "KiwiApp",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./KiwiPage": "./src/components/kiwi-page/kiwi-page.js",
+      },
     }),
   ],
 };
